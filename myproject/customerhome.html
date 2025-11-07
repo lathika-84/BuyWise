@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Customer - Purchase Products</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="customerhome.css">
+</head>
+<body>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0">Available Products</h2>
+    <input type="search" id="searchInput" class="form-control w-50" placeholder="Search products..."/>
+  </div>
+  <div id="productList" class="mb-5"></div>
+</div>
+
+<!-- Bottom Navbar -->
+<div class="bottom-nav">
+  <div class="cart-container">
+    <button id="cartBtn" class="btn btn-outline-success position-relative" type="button">
+      Cart <span class="badge bg-danger" id="cartCount">0</span>
+    </button>
+  </div>
+  <div class="profile-container">
+    <a href="customerprofile.html" class="profile-btn" aria-label="Profile">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Icon"/>
+    </a>
+  </div>
+</div>
+
+<!-- Cart Panel (same as before) -->
+<div id="cartPanel">
+  <h4>Your Cart</h4>
+  <ul class="list-group mb-2" id="cartList"></ul>
+  <p class="fw-bold">Total: ₹<span id="cartTotal">0</span></p>
+  <button class="btn btn-primary" onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+const backendUrl = 'http://localhost:8080/api/products';
+let cart = [];
+
+// ...fetchAndDisplayProducts and cart logic from earlier message (no change except search code below)...
+// Add to cart logic
+function addToCart(product) {
+  let item = cart.find(el => el.id === product.id);
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({...product, qty: 1});
+  }
+  renderCart();
+}
+
+// Remove from cart
+function removeFromCart(idx) {
+  cart.splice(idx, 1);
+  renderCart();
+}
+
+// Render cart panel
+function renderCart() {
+  const cartList = document.getElementById('cartList');
+  const cartCount = document.getElementById('cartCount');
+  const cartTotal = document.getElementById('cartTotal');
+  cartList.innerHTML = '';
+  let total = 0, count = 0;
+  cart.forEach((item, idx) => {
+    total += item.price * item.qty;
+    count += item.qty;
+    cartList.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        ${item.name} x ${item.qty}
+        <span>
+          ₹${item.price * item.qty}
+          <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${idx})">&times;</button>
+        </span>
+      </li>`;
+  });
+  cartCount.textContent = count;
+  cartTotal.textContent = total;
+}
+
+// Checkout function
+function checkout() {
+  if(cart.length === 0) return alert('Cart is empty!');
+  alert('Order placed successfully!');
+  cart = [];
+  renderCart();
+}
+
+// Fetch and display products
+async function fetchAndDisplayProducts() {
+  const categories = ['grocery', 'clothes', 'accessories'];
+  const productList = document.getElementById('productList');
+  productList.innerHTML = '';
+
+  for (const cat of categories) {
+    const response = await fetch(`${backendUrl}?category=${cat}`);
+    const products = await response.json();
+
+    if (products.length > 0) {
+      const catHeader = document.createElement('h4');
+      catHeader.className = 'category-header';
+      catHeader.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      productList.appendChild(catHeader);
+
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'row';
+
+      products.forEach(product => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-6 col-md-4 mb-4 product-card';
+        colDiv.setAttribute('data-name', product.name);
+
+        colDiv.innerHTML = `<div class="card product">
+          <img class="card-img-top" src="https://via.placeholder.com/200?text=${encodeURIComponent(product.name)}" alt="${product.name}"/>
+          <div class="card-body text-center">
+            <h5 class="card-title">${product.name}</h5>
+            <p class="card-text">₹${product.price} <br> Expiry: ${product.expiry}</p>
+            <button class="btn btn-success" onclick='addToCart(${JSON.stringify(product)})'>Add to Cart</button>
+          </div>
+        </div>`;
+        rowDiv.appendChild(colDiv);
+      });
+      productList.appendChild(rowDiv);
+    }
+  }
+}
+
+// Search logic:
+document.getElementById('searchInput').addEventListener('input', function() {
+  const value = this.value.toLowerCase();
+  document.querySelectorAll('.product-card').forEach(function(card) {
+    card.style.display = card.getAttribute('data-name').toLowerCase().includes(value) ? '' : 'none';
+  });
+});
+
+// Cart panel show/hide
+const cartBtn = document.getElementById('cartBtn');
+const cartPanel = document.getElementById('cartPanel');
+cartBtn.addEventListener('click', () => {
+  cartPanel.classList.toggle('show');
+});
+document.addEventListener('click', (e) => {
+  if (!cartPanel.contains(e.target) && !cartBtn.contains(e.target)) {
+    cartPanel.classList.remove('show');
+  }
+});
+
+// Call fetchAndDisplayProducts and the rest as previously described.
+window.onload = fetchAndDisplayProducts;
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+body {
+    background: #f9f9f9;
+}
+.container {
+    max-width: 400px;
+}
+img.rounded-circle {
+    border: 3px solid #7ee884;
+}

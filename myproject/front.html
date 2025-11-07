@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        img{
+        padding-top:200px;
+        height: 150px;
+        width: 150px;
+        padding-left: 450px;
+        }
+        div{
+            display: flex;
+        }
+        h1{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top:200px;
+            padding-left: 20px;
+            color: goldenrod;
+            font-size: 60px;
+        }
+        body {
+
+    transition: filter 1s ease-in-out; /* Smooth transition for the filter property */
+}
+
+/* The class we will add with JavaScript to trigger the blur */
+.blur-out {
+    filter: blur(10px); /* Adjust the pixel value to control blur strength */
+}
+
+.content {
+    text-align: center;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    // Wait for the page to fully load before starting the timer
+    const transitionDelay = 2000; // Time in milliseconds (e.g., 2000 = 2 seconds)
+    const blurDuration = 1000; // Matches the CSS transition duration
+
+    // Use a timeout to trigger the transition
+    setTimeout(function() {
+        // Add the 'blur-out' class to the body to start the blur animation
+        document.body.classList.add('blur-out');
+
+        // After the blur animation is complete, navigate to the next page
+        setTimeout(function() {
+            window.location.href = 'basic.html';
+        }, blurDuration);
+
+    }, transitionDelay);
+});
+
+    </script>
+</head>
+<body>    
+    <div class="content">
+         <img src="buywise.jpg" >
+         <h1>BuyWise</h1>
+    </div> 
+</body>
+</html>

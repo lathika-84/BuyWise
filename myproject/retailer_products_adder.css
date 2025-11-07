@@ -1,0 +1,42 @@
+body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        form {
+            background: #f2f2f2;
+            padding: 15px;
+            border-radius: 10px;
+            width: 350px;
+        }
+        h2 {
+            color: #333;
+        }
+        input, select, button {
+            margin: 5px 0;
+            width: 100%;
+            padding: 8px;
+        }
+        .category {
+            margin-top: 20px;
+        }
+        .product {
+            border: 1px solid #aaa;
+            margin: 5px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        #nav{
+            background-color: rgb(20, 17, 99);
+    display: flex;
+    position:sticky;
+    text-align: center;
+    z-index: 10;
+}
+
+a{
+    padding-left:535px;
+    padding-top: 13px;
+    text-decoration: 100%;
+    color: white;
+    font-variant: small-caps;font-size: large;font-family: sans-serif;
+}

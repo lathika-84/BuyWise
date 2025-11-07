@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Retailer Product Management</title>
+    <link rel="stylesheet" href="retailer_products_adder.css">
+    <script src="retailer_products_adder.js"></script>
+</head>
+<body>
+<!--NAVBAR-->
+    <div id="nav" class="navbar-light border-light">
+            <img src="buywise.jpg" alt="buywise" width="50" height="50" style="padding: 3px;">
+            <p  style="font-variant: small-caps;font-size: large;font-family: sans-serif; color: goldenrod;">BuyWise</p>
+            <a  href="basic.html">Home</a>
+    </div>
+<h2>Add Product</h2>
+<form id="productForm">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="number" id="weight" placeholder="Weight" required/>
+    <input type="number" id="price" placeholder="Price" required>
+    <input type="date" id="expiry" required>
+    <select id="category">
+        <option value="grocery">Grocery</option>
+        <option value="clothes">Clothes</option>
+        <option value="accessories">Accessories</option>
+    </select>
+    <button type="button" onclick="addProduct()">Add Product</button>
+</form>
+<h2>Available Products</h2>
+<div id="productDisplay"></div>
+
+<script>
+    const backendUrl = 'http://localhost:8080/api/products';
+    async function addProduct() {
+    const product = {
+        name: document.getElementById('name').value,
+        weight: parseFloat(document.getElementById('weight').value),
+        price: parseFloat(document.getElementById('price').value),
+        expiry: document.getElementById('expiry').value,
+        category: document.getElementById('category').value
+    };
+    console.log("Sending product", product);
+    const response = await fetch(backendUrl,{
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(product)
+    });
+    if (!response.ok) {
+        console.error('POST failed', await response.text());
+    }
+    loadProducts();
+    document.getElementById('productForm').reset(); 
+    }
+
+
+    async function loadProducts() {
+        const categories = ['grocery', 'clothes', 'accessories'];
+        const displayDiv = document.getElementById('productDisplay');
+        displayDiv.innerHTML = '';
+
+        for (const cat of categories) {
+            const response = await fetch(`${backendUrl}?category=${cat}`);
+            const products = await response.json();
+
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+            categoryDiv.innerHTML = `<h3>${cat.toUpperCase()}</h3>`;
+
+            products.forEach(p => {
+                const pDiv = document.createElement('div');
+                pDiv.className = 'product';
+                pDiv.innerHTML = `<strong>${p.name}</strong><br>Weight: ${p.weight}kg<br>Price: ₹${p.price}<br>Expiry: ${p.expiry}`+`<br><button onclick="removeProduct(${p.id})">Remove</button>`;
+                categoryDiv.appendChild(pDiv);
+            });
+
+            displayDiv.appendChild(categoryDiv);
+        }
+    }
+    async function removeProduct(id) {
+    const response = await fetch(`${backendUrl}/${id}`, {
+        method: 'DELETE'
+    });
+    if (!response.ok) {
+        console.error('DELETE failed', await response.text());
+    }
+    loadProducts();
+    }
+    window.onload = loadProducts;
+</script>
+
+</body>
+</html>
